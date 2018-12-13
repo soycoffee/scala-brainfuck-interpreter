@@ -1,6 +1,6 @@
 import scala.util.{Success, Try}
 
-case class RunningState(dataPointer: Int, data: Map[Int, Byte], instructionPointer: Int, output: Seq[Byte])(implicit val source: Seq[Command], val input: Input.Type) {
+case class RunningState(dataPointer: Int, data: Map[Int, Byte], instructionPointer: Int, output: Seq[Byte], input: InputState[_])(implicit val source: Seq[Command]) {
 
   def shiftDataPointer(amount: Byte): RunningState =
     copy(dataPointer = dataPointer + amount)
@@ -8,8 +8,10 @@ case class RunningState(dataPointer: Int, data: Map[Int, Byte], instructionPoint
   def shiftDataValue(amount: Byte): RunningState =
     copy(data = data.updated(dataPointer, (dataValue + amount).toByte))
 
-  def readInput: RunningState =
-    copy(data = data.updated(dataPointer, input()))
+  def readInput: RunningState = {
+    val (dataValue, nextInput) = input.nextByte
+    copy(data = data.updated(dataPointer, dataValue), input = nextInput)
+  }
 
   def pushOutput: RunningState =
     copy(output = output :+ dataValue)
@@ -30,8 +32,8 @@ case class RunningState(dataPointer: Int, data: Map[Int, Byte], instructionPoint
 
 object RunningState {
 
-  def init(implicit source: Seq[Command], input: Input.Type) =
-    RunningState(0, Map.empty, 0, Seq.empty)
+  def init(input: InputState[_], source: Seq[Command]): RunningState =
+    RunningState(0, Map.empty, 0, Seq.empty, input)(source)
 
 }
 

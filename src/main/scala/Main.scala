@@ -1,6 +1,6 @@
 object Main {
 
-  val input: Input.Type = Input.StdIn
+  val input: InputState[_] = InputState.StdIn
 
   lazy val loader = Loader()
   lazy val parser = Parser()
