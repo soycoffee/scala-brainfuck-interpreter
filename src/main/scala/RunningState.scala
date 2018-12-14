@@ -2,6 +2,12 @@ import scala.util.{Success, Try}
 
 case class RunningState(dataPointer: Int, data: Map[Int, Byte], instructionPointer: Int, output: Seq[Byte], input: InputState[_])(implicit val source: Seq[Command]) {
 
+  def instruction: Option[Command] =
+    source.lift(instructionPointer)
+
+  def instruct: Option[Try[RunningState]] =
+    instruction.map(_.run(this))
+
   def shiftDataPointer(amount: Byte): RunningState =
     copy(dataPointer = dataPointer + amount)
 

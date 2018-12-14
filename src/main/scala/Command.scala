@@ -62,7 +62,7 @@ object Command {
       (instructionPointers zip nestCounts)
         .find(tupled ((i, nestCount) => source(i) == needle && nestCount == 0))
         .map(_._1)
-        .fold[Try[Int]](Failure(BalanceNotFound(instructionPointers.head)))(Success(_))
+        .fold[Try[Int]](Failure(BalanceNotFound(instructionPointers)))(Success(_))
     }
 
     private def calculateNestCounts(instructionPointers: Seq[Int], source: Seq[Command]): Seq[Int] = {
@@ -78,7 +78,7 @@ object Command {
         })
     }
 
-    case class BalanceNotFound(position: Int) extends Throwable
+    case class BalanceNotFound(range: Range) extends Exception(s"range=$range")
 
   }
 
