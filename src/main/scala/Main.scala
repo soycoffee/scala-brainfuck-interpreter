@@ -1,6 +1,7 @@
-object Main {
+trait Main {
 
-  val input: InputState[_] = InputState.StdIn
+  def input: InputState[_]
+  def output: String => Unit
 
   lazy val loader = Loader()
   lazy val parser = Parser()
@@ -9,7 +10,14 @@ object Main {
   def main(args: Array[String]): Unit = {
     assert(args.length >= 1)
     val result = (loader andThen parser andThen (_.flatMap(runner)))(args(0))
-    println(result.get)
+    output(new String(result.get.output.toArray))
   }
+
+}
+
+object Main extends Main {
+
+  override def input: InputState[_] = InputState.StdIn
+  override def output: String => Unit = print
 
 }
